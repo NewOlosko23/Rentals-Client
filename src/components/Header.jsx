@@ -6,8 +6,9 @@ import {
   Home,
   Building2,
   KeyRound,
-  Phone,
+  Bell,
   Plus,
+  Phone,
   User,
   LogOut,
   LayoutDashboard,
@@ -45,13 +46,22 @@ export default function Header({ brand = "HouseConnect" }) {
     };
   }, [open]);
 
-  // Navigation menu
+  // 🔹 Updated navigation menu
   const nav = [
     user
       ? { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard }
       : { to: "/", label: "Home", icon: Home },
+
     { to: "/listings", label: "Listings", icon: Building2 },
-    { to: "/contact", label: "Contact", icon: Phone },
+
+    // conditional Contact vs Notifications
+    user
+      ? { to: "/dashboard/notifications", label: "Notifications", icon: Bell }
+      : { to: "/contact", label: "Contact Us", icon: Phone },
+
+    ...(user
+      ? [{ to: "/dashboard/profile", label: "Profile", icon: User }]
+      : []),
   ];
 
   const isActive = (to) =>
@@ -117,7 +127,7 @@ export default function Header({ brand = "HouseConnect" }) {
             </button>
 
             <Link
-              to="/post"
+              to="/dashboard/post"
               className="inline-flex items-center gap-2 rounded-full bg-gray-900 text-white px-4 py-2 text-sm font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
             >
               <Plus className="h-4 w-4" />
@@ -159,19 +169,17 @@ export default function Header({ brand = "HouseConnect" }) {
       {/* Mobile drawer */}
       {open && (
         <div>
-          {/* Overlay */}
           <div
             className="fixed inset-0 z-40 bg-black/30"
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          {/* Panel */}
           <aside
             id="mobile-menu"
             ref={panelRef}
             role="dialog"
             aria-label="Navigation"
-            className="fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm bg-white shadow-xl border-l border-gray-200 transform transition-transform data-[state=open]:translate-x-0"
+            className="fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm bg-white shadow-xl border-l border-gray-200"
           >
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <Link to="/" className="text-lg font-semibold text-gray-900">

@@ -10,6 +10,11 @@ import Contact from "./pages/Contact";
 import Listings from "./pages/Listings";
 import NotFound from "./pages/NotFound";
 import ListingPage from "./pages/ListingPage";
+import Profile from "./pages/Dashboard/Profile";
+import Notifications from "./pages/Dashboard/Notifications";
+import Post from "./pages/Dashboard/Post";
+import Blogs from "./pages/Blogs";
+import BlogsPage from "./pages/BlogsPage";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -68,11 +73,37 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/dashboard/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/post"
+          element={
+            <PrivateRoute>
+              <Post />
+            </PrivateRoute>
+          }
+        />
 
         {/* Always accessible */}
         <Route path="/about" element={<About />} />
         <Route path="/listings" element={<Listings />} />
         <Route path="/listing/:type/:id" element={<ListingPage />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:id" element={<BlogsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

@@ -1,33 +1,5 @@
-import React from "react";
-
-const blogPosts = [
-  {
-    title: "How to List Your Property",
-    summary:
-      "Step-by-step guide to listing your property on our platform for maximum visibility.",
-    link: "#",
-  },
-  {
-    title: "Guide to Renting Properties",
-    summary: "Learn how to find and rent properties easily with our platform.",
-    link: "#",
-  },
-  {
-    title: "Leasing Made Simple",
-    summary: "Tips and tricks for leasing properties efficiently and safely.",
-    link: "#",
-  },
-  {
-    title: "Buying Property Through the Platform",
-    summary: "A complete walkthrough on purchasing your dream property.",
-    link: "#",
-  },
-  {
-    title: "Platform Guidelines & Best Practices",
-    summary: "Important rules and guidelines to make the most of our platform.",
-    link: "#",
-  },
-];
+import { Link } from "react-router-dom";
+import blogPosts from "../../data/blogs";
 
 const Blog = () => {
   return (
@@ -47,12 +19,12 @@ const Blog = () => {
           >
             <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
             <p className="text-gray-700 mb-4">{post.summary}</p>
-            <a
-              href={post.link}
+            <Link
+              to={`/blogs/${post.id}`}
               className="text-indigo-600 font-semibold hover:underline"
             >
               Read More →
-            </a>
+            </Link>
           </div>
         ))}
       </div>
