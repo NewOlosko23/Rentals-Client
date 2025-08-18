@@ -9,13 +9,24 @@ import {
   Phone,
   Plus,
   User,
+  LogOut,
+  LayoutDashboard,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header({ brand = "HouseConnect" }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const panelRef = useRef(null);
+  const navigate = useNavigate();
+
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -34,8 +45,11 @@ export default function Header({ brand = "HouseConnect" }) {
     };
   }, [open]);
 
+  // Navigation menu
   const nav = [
-    { to: "/", label: "Home", icon: Home },
+    user
+      ? { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard }
+      : { to: "/", label: "Home", icon: Home },
     { to: "/listings", label: "Listings", icon: Building2 },
     { to: "/contact", label: "Contact", icon: Phone },
   ];
@@ -110,13 +124,23 @@ export default function Header({ brand = "HouseConnect" }) {
               Post Property
             </Link>
 
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
-            >
-              <User className="h-4 w-4" />
-              <span className="hidden lg:inline">Sign in</span>
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center cursor-pointer gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden lg:inline">Logout</span>
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 cursor-pointer rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden lg:inline">Sign in</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -200,14 +224,28 @@ export default function Header({ brand = "HouseConnect" }) {
                   <Plus className="h-4 w-4" />
                   Post
                 </Link>
-                <Link
-                  to="/login"
-                  onClick={() => setOpen(false)}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:bg-gray-50"
-                >
-                  <User className="h-4 w-4" />
-                  Sign in
-                </Link>
+
+                {user ? (
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setOpen(false);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:bg-gray-50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:bg-gray-50"
+                  >
+                    <User className="h-4 w-4" />
+                    Sign in
+                  </Link>
+                )}
               </div>
             </div>
           </aside>

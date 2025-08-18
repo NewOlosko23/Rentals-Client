@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,17 +25,13 @@ const Login = () => {
         { email, password }
       );
 
-      // Save token to localStorage
-      if (res.data?.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-
-      // If API sends user data, store it too
       if (res.data?.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+        login({
+          ...res.data.user,
+          token: res.data.token,
+        });
       }
 
-      // Redirect to home/dashboard
       navigate("/dashboard");
     } catch (err) {
       setError(
@@ -118,7 +116,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition ${
+            className={`w-full bg-gray-900 text-white py-3 rounded-lg cursor-pointer font-medium hover:bg-gray-800 transition ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >

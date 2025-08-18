@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -15,6 +16,7 @@ const Register = () => {
   const [success, setSuccess] = useState("");
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,13 +39,11 @@ const Register = () => {
         { name, email, phone, password }
       );
 
-      // Save token if returned
-      if (res.data?.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-
       if (res.data?.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+        login({
+          ...res.data.user,
+          token: res.data.token,
+        });
       }
 
       setSuccess("Registration successful! Redirecting...");
@@ -205,7 +205,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition ${
+            className={`w-full bg-gray-900 text-white py-3 cursor-pointer rounded-lg font-medium hover:bg-gray-800 transition ${
               loading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
