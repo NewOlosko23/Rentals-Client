@@ -20,8 +20,11 @@ const Dashboard = () => {
           <div className="space-y-3 text-sm tracking-tight">
             <p>
               <span className="font-medium text-gray-700">Name:</span>{" "}
-              {user.username}
+              {user.userType === "company"
+                ? user.company?.officialName || "N/A"
+                : user.name}
             </p>
+
             <p>
               <span className="font-medium text-gray-700">Email:</span>{" "}
               {user.email}

@@ -73,14 +73,12 @@ const ListingPage = () => {
         <div className="lg:col-span-2 space-y-10">
           {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {listing.title}
-            </h1>
-            <p className="flex items-center gap-2 text-lg text-gray-600 mt-2">
+            <h1 className="text-xl font-bold text-gray-900">{listing.title}</h1>
+            <p className="flex items-center gap-2 text-md text-gray-600 mt-2">
               <MapPin className="w-5 h-5 text-indigo-600" />
               {listing.address}, {listing.estate}, {listing.city}
             </p>
-            <p className="text-xl text-indigo-700 font-semibold mt-4">
+            <p className="text-md text-indigo-700 font-semibold mt-4">
               {listing.transactionType?.toLowerCase() === "rent"
                 ? `KES ${listing.price.toLocaleString()} / month`
                 : `KES ${listing.price.toLocaleString()}`}
@@ -121,7 +119,7 @@ const ListingPage = () => {
 
           {/* Description */}
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Description
             </h2>
             <p className="text-gray-700 leading-relaxed text-[15px]">
@@ -133,7 +131,7 @@ const ListingPage = () => {
           {/* Amenities */}
           {listing.amenities && listing.amenities.length > 0 && (
             <div className="my-4 py-2">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Amenities
               </h2>
               <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">

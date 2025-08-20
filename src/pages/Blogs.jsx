@@ -12,8 +12,10 @@ const Blogs = () => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 mt-14">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Our Blogs</h1>
+    <div className="max-w-6xl mx-auto px-6 py-12 mt-14">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6 tracking-tight">
+        Our Blogs
+      </h1>
 
       {/* Search Bar */}
       <input
@@ -21,7 +23,7 @@ const Blogs = () => {
         placeholder="Search blogs..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full p-3 mb-8 border rounded-xl focus:ring-2 focus:ring-indigo-500"
+        className="w-full p-3 mb-10 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
       />
 
       {/* Blogs Grid */}
@@ -30,16 +32,27 @@ const Blogs = () => {
           filteredBlogs.map((post) => (
             <div
               key={post.id}
-              className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition"
+              className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 flex flex-col p-6"
             >
-              <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-              <p className="text-gray-700 mb-4">{post.summary}</p>
-              <Link
-                to={`/blogs/${post.id}`}
-                className="text-indigo-600 font-semibold hover:underline"
-              >
-                Read More →
-              </Link>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+                {post.title}
+              </h3>
+              <div className="text-gray-400 text-sm mb-3 flex justify-between">
+                <span>By {post.author}</span>
+                <span>{post.date}</span>
+              </div>
+              <p className="text-gray-600 mb-6 text-sm line-clamp-5">
+                {post.content.substring(0, 300)}...
+              </p>
+              <div className="mt-auto">
+                <Link
+                  to={`/blogs/${post.id}`}
+                  className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-700 transition"
+                >
+                  Read More
+                  <span className="ml-1">→</span>
+                </Link>
+              </div>
             </div>
           ))
         ) : (

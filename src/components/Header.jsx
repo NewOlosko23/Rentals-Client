@@ -120,7 +120,7 @@ export default function Header({ brand = "House Connect" }) {
           <div className="hidden md:flex items-center gap-2">
             <Link
               to="/dashboard/post-property"
-              className="inline-flex items-center gap-2 rounded-full bg-gray-900 text-white px-4 py-2 text-sm font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+              className="inline-flex items-center cursor-pointer gap-2 rounded-full bg-gray-900 text-white px-4 py-2 text-sm font-medium shadow hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
             >
               <Plus className="h-4 w-4" />
               Post Property

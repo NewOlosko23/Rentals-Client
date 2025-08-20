@@ -35,7 +35,7 @@ const Hero = () => {
             Find Your Home
           </Link>
           <Link
-            to="/dashboard/post"
+            to="/dashboard/post-property"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white px-6 py-3 font-medium shadow hover:bg-black transition"
           >
             <Plus className="h-5 w-5" />

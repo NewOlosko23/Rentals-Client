@@ -167,19 +167,21 @@ const Listings = () => {
         {/* Actions Row */}
         <div className="flex justify-between items-center mt-6 flex-wrap gap-3 text-sm">
           {/* Around Me + Radius */}
-          <div className="flex items-center gap-3 ">
-            <Button onClick={handleAroundMe}>Around Me</Button>
+          <div className="flex items-center gap-3">
+            <Button className="cursor-pointer" onClick={handleAroundMe}>
+              Around Me
+            </Button>
 
             <div className="flex items-center border rounded-lg overflow-hidden">
               <button
-                className="px-3 py-1 bg-gray-200 hover:bg-gray-300"
+                className="px-3 py-1 bg-gray-200 hover:bg-gray-300 cursor-pointer"
                 onClick={() => setRadius((r) => Math.max(1, r - 1))}
               >
                 −
               </button>
               <span className="px-4 py-1 text-gray-700">{radius} km</span>
               <button
-                className="px-3 py-1 bg-gray-200 hover:bg-gray-300"
+                className="px-3 py-1 bg-gray-200 hover:bg-gray-300 cursor-pointer"
                 onClick={() => setRadius((r) => r + 1)}
               >
                 +
@@ -189,12 +191,16 @@ const Listings = () => {
 
           {/* Clear and Search Buttons */}
           <div className="flex gap-3">
-            <Button onClick={clearFilters} variant="danger">
+            <Button
+              className="cursor-pointer"
+              onClick={clearFilters}
+              variant="danger"
+            >
               <X className="w-4 h-4" />
               Clear
             </Button>
 
-            <Button onClick={handleSearch}>
+            <Button className="cursor-pointer" onClick={handleSearch}>
               <Search className="w-4 h-4" />
               Search
             </Button>
