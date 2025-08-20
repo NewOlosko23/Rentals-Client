@@ -1,22 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapPin, Home, X, Search, Image } from "lucide-react";
 import { Link } from "react-router-dom";
 import { mockListings } from "../data/Listings";
+import Button from "../components/Button";
 
 const PLACEHOLDER =
   "https://via.placeholder.com/1200x800.png?text=No+Image+Available";
+
+// Haversine formula
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 
 const Listings = () => {
   const [location, setLocation] = useState("");
   const [type, setType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [radius, setRadius] = useState(10); // default 10 km
   const [filteredListings, setFilteredListings] = useState(mockListings);
   const [currentPage, setCurrentPage] = useState(1);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const ITEMS_PER_PAGE = 15;
   const totalPages = Math.ceil(filteredListings.length / ITEMS_PER_PAGE);
@@ -24,9 +37,9 @@ const Listings = () => {
   const handleSearch = () => {
     const results = mockListings.filter((listing) => {
       const matchesLocation = location
-        ? listing.location?.toLowerCase().includes(location.toLowerCase())
+        ? listing.city?.toLowerCase().includes(location.toLowerCase())
         : true;
-      const matchesType = type ? listing.type === type : true;
+      const matchesType = type ? listing.transactionType === type : true;
       const matchesPrice =
         (minPrice ? listing.price >= minPrice : true) &&
         (maxPrice ? listing.price <= maxPrice : true);
@@ -36,11 +49,30 @@ const Listings = () => {
     setCurrentPage(1);
   };
 
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   const handleAroundMe = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
-        alert(`Your coordinates: Latitude ${latitude}, Longitude ${longitude}`);
+        const nearbyListings = mockListings.filter((listing) => {
+          if (!listing.lat || !listing.lng) return false;
+          const distance = getDistanceFromLatLonInKm(
+            latitude,
+            longitude,
+            listing.lat,
+            listing.lng
+          );
+          return distance <= radius;
+        });
+        setFilteredListings(nearbyListings);
+        setCurrentPage(1);
       });
     } else {
       alert("Geolocation is not supported by your browser.");
@@ -52,6 +84,7 @@ const Listings = () => {
     setType("");
     setMinPrice("");
     setMaxPrice("");
+    setRadius(10);
     setFilteredListings(mockListings);
     setCurrentPage(1);
   };
@@ -68,7 +101,7 @@ const Listings = () => {
         <h2 className="text-xl font-bold mb-6">Search Properties</h2>
 
         {/* Filters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
           {/* Location Input */}
           <div className="flex flex-col">
             <label className="flex items-center text-gray-700 font-medium mb-1 gap-1 text-sm">
@@ -132,29 +165,39 @@ const Listings = () => {
         </div>
 
         {/* Actions Row */}
-        <div className="flex justify-between items-center mt-6 flex-wrap gap-3">
-          <button
-            onClick={handleAroundMe}
-            className="px-5 py-2 rounded-lg cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 transition"
-          >
-            Around Me
-          </button>
+        <div className="flex justify-between items-center mt-6 flex-wrap gap-3 text-sm">
+          {/* Around Me + Radius */}
+          <div className="flex items-center gap-3 ">
+            <Button onClick={handleAroundMe}>Around Me</Button>
 
+            <div className="flex items-center border rounded-lg overflow-hidden">
+              <button
+                className="px-3 py-1 bg-gray-200 hover:bg-gray-300"
+                onClick={() => setRadius((r) => Math.max(1, r - 1))}
+              >
+                −
+              </button>
+              <span className="px-4 py-1 text-gray-700">{radius} km</span>
+              <button
+                className="px-3 py-1 bg-gray-200 hover:bg-gray-300"
+                onClick={() => setRadius((r) => r + 1)}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Clear and Search Buttons */}
           <div className="flex gap-3">
-            <button
-              onClick={clearFilters}
-              className="flex items-center cursor-pointer gap-2 px-5 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
-            >
+            <Button onClick={clearFilters} variant="danger">
               <X className="w-4 h-4" />
               Clear
-            </button>
-            <button
-              onClick={handleSearch}
-              className="flex items-center cursor-pointer gap-2 px-5 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
-            >
+            </Button>
+
+            <Button onClick={handleSearch}>
               <Search className="w-4 h-4" />
               Search
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -167,7 +210,6 @@ const Listings = () => {
           </p>
         ) : (
           paginatedListings.map((listing) => {
-            // normalize images
             const images = Array.isArray(listing.images)
               ? listing.images
               : listing.image
@@ -180,40 +222,83 @@ const Listings = () => {
             const imageCount = images.length;
 
             const priceLabel =
-              listing.type === "Rent"
+              listing.transactionType === "Rent"
                 ? `KES ${Number(listing.price).toLocaleString()} / month`
                 : `KES ${Number(listing.price).toLocaleString()}`;
 
             return (
               <Link
-                to={`/listing/${listing.type?.toLowerCase()}/${listing.id}`}
+                to={`/listing/${listing.transactionType?.toLowerCase()}/${
+                  listing.id
+                }`}
                 key={listing.id}
                 className="block transform transition duration-300 hover:scale-105"
               >
                 <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:bg-gray-50 cursor-pointer relative">
-                  <img
-                    src={firstImage}
-                    alt={listing.title}
-                    className="w-full h-48 object-cover"
-                    loading="lazy"
-                  />
+                  <div className="relative w-full h-48">
+                    <img
+                      src={firstImage}
+                      alt={listing.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
 
-                  {imageCount > 1 && (
-                    <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <Image className="w-3 h-3" />
-                      <span>{imageCount}</span>
-                    </div>
-                  )}
+                    {imageCount > 1 && (
+                      <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <Image className="w-3 h-3" />
+                        <span>{imageCount} Photos</span>
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                  <div className="p-4 space-y-2">
+                    {/* Title */}
+                    <h3 className="text-md font-semibold text-gray-800">
                       {listing.title}
                     </h3>
-                    <p className="text-gray-500">{listing.location}</p>
-                    <p className="text-blue-600 font-bold mt-2">{priceLabel}</p>
-                    <span className="text-sm text-gray-600">
-                      Type: {listing.type}
-                    </span>
+
+                    {/* Estate & City */}
+                    <p className="text-gray-600 text-sm">
+                      {listing.estate}, {listing.city}
+                    </p>
+
+                    {/* Address */}
+                    <p className="text-gray-500 text-xs italic">
+                      {listing.address}
+                    </p>
+
+                    {/* Price */}
+                    <p className="text-indigo-600 font-bold mt-2 text-sm">
+                      {priceLabel}
+                    </p>
+
+                    {/* Tags Row */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="text-xs text-gray-700 border rounded-2xl px-2 py-1 bg-gray-50">
+                        {listing.transactionType}
+                      </span>
+                      <span className="text-xs text-gray-700 border rounded-2xl px-2 py-1 bg-gray-50">
+                        {listing.purpose}
+                      </span>
+                      <span className="text-xs text-gray-700 border rounded-2xl px-2 py-1 bg-gray-50">
+                        {listing.category}
+                      </span>
+                    </div>
+
+                    {/* Optional quick stats (if residential with rooms) */}
+                    {(listing.bedrooms ||
+                      listing.bathrooms ||
+                      listing.size) && (
+                      <div className="text-xs text-gray-500 mt-2 flex gap-4">
+                        {listing.bedrooms && (
+                          <span>🛏 {listing.bedrooms} bd</span>
+                        )}
+                        {listing.bathrooms && (
+                          <span>🛁 {listing.bathrooms} ba</span>
+                        )}
+                        {listing.size && <span>📐 {listing.size}</span>}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>
@@ -225,43 +310,34 @@ const Listings = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="max-w-6xl mx-auto flex justify-center mt-8 gap-2">
-          <button
+          {/* Prev */}
+          <Button
+            onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            className={`px-4 py-2 rounded-lg ${
-              currentPage === 1
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
+            variant={currentPage === 1 ? "secondary" : "primary"}
           >
             Prev
-          </button>
+          </Button>
 
+          {/* Numbers */}
           {[...Array(totalPages)].map((_, i) => (
-            <button
+            <Button
               key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg ${
-                currentPage === i + 1
-                  ? "bg-indigo-700 text-white"
-                  : "bg-gray-200 hover:bg-indigo-100"
-              }`}
+              onClick={() => goToPage(i + 1)}
+              variant={currentPage === i + 1 ? "primary" : "secondary"}
             >
               {i + 1}
-            </button>
+            </Button>
           ))}
 
-          <button
+          {/* Next */}
+          <Button
+            onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className={`px-4 py-2 rounded-lg ${
-              currentPage === totalPages
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
+            variant={currentPage === totalPages ? "secondary" : "primary"}
           >
             Next
-          </button>
+          </Button>
         </div>
       )}
     </div>

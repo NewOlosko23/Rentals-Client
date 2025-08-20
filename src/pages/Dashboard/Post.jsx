@@ -1,266 +1,293 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Upload, X } from "lucide-react";
 
-const Post = () => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+const categories = {
+  residential: [
+    "bedsitter",
+    "1br",
+    "2br",
+    "3br",
+    "apartment",
+    "house",
+    "airbnb",
+    "hotel",
+  ],
+  commercial: [
+    "office",
+    "stall",
+    "shop",
+    "warehouse",
+    "empty_space",
+    "building",
+  ],
+  land: ["plot", "agricultural", "industrial", "other"],
+};
 
-  const user = JSON.parse(localStorage.getItem("user"));
+export default function PostProperty() {
+  const [purpose, setPurpose] = useState("residential");
+  const [images, setImages] = useState([]);
 
-  const token = user ? user.token : null;
-
-  const [form, setForm] = useState({
-    title: "",
-    type: "",
-    category: "",
-    price: "",
-    city: "",
-    estate: "",
-    bedrooms: "",
-    bathrooms: "",
-    size: "",
-    amenities: "",
-    description: "",
-  });
-
-  const [files, setFiles] = useState([]);
-
-  useEffect(() => {
-    if (!token) navigate("/login");
-  }, [navigate]);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + images.length > 10)
+      return alert("Max 10 images allowed");
+    setImages([...images, ...files]);
   };
 
-  const handleFileChange = (e) => {
-    setFiles(e.target.files);
+  const removeImage = (index) => {
+    setImages(images.filter((_, i) => i !== index));
   };
 
-  const nextStep = () => setStep((s) => s + 1);
-  const prevStep = () => setStep((s) => s - 1);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    const data = new FormData();
-    Object.keys(form).forEach((key) => data.append(key, form[key]));
-    for (let i = 0; i < files.length; i++) {
-      data.append("files", files[i]);
-    }
-
-    try {
-      const res = await fetch(
-        "https://rentals-server.onrender.com/api/properties",
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: data,
-        }
-      );
-      const result = await res.json();
-      if (res.ok) {
-        alert("✅ Property created successfully!");
-        navigate("/dashboard");
-      } else {
-        alert(result.message || "❌ Failed to create property");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    const formData = new FormData(e.target);
+    images.forEach((img) => formData.append("images", img));
+    console.log("Form submitted");
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-28">
-      {/* Stepper */}
-      <div className="flex justify-between mb-8">
-        {["Basic Info", "Details", "Media"].map((label, index) => (
-          <div
-            key={index}
-            className={`flex-1 text-center pb-2 border-b-4 ${
-              step === index + 1
-                ? "border-indigo-600 text-indigo-600 font-semibold"
-                : "border-gray-200 text-gray-500"
-            }`}
-          >
-            {label}
-          </div>
-        ))}
-      </div>
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-8 mt-24">
+      <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-2">
+        Post a Property
+      </h2>
+      <h3 className="text-gray-600 mb-6 text-sm">
+        Welcome! Share your property details and get your listing in front of
+        thousands of potential buyers and renters. Posting is quick, easy, and
+        helps your property get discovered faster.
+      </h3>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Step 1 - Basic Info */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <input
-              type="text"
-              name="title"
-              placeholder="Property Title"
-              value={form.title}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              required
-            />
-            <div className="grid grid-cols-2 gap-6">
-              <input
-                type="text"
-                name="type"
-                placeholder="Type (e.g., Apartment)"
-                value={form.type}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="category"
-                placeholder="Category (e.g., Rent, Sale)"
-                value={form.category}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-            <input
-              type="number"
-              name="price"
-              placeholder="Price"
-              value={form.price}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-            />
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={nextStep}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Title */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Title</label>
+          <p className="text-sm text-gray-500 text-sm">
+            Give your property a short, clear title (e.g. “Modern 2BR Apartment
+            in Kilimani”).
+          </p>
+          <input
+            name="title"
+            required
+            className="w-full border rounded-lg p-2 focus:ring focus:ring-gray-200"
+          />
+        </div>
 
-        {/* Step 2 - Details */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <input
-                type="text"
-                name="city"
-                placeholder="City"
-                value={form.city}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="estate"
-                placeholder="Estate"
-                value={form.estate}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-6">
+        {/* Transaction Type */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700 text-sm">
+            Transaction Type
+          </label>
+          <p className="text-sm text-gray-500">
+            Select whether the property is for rent, sale, or lease.
+          </p>
+          <select
+            name="transactionType"
+            required
+            className="w-full border rounded-lg p-2 text-sm"
+          >
+            <option value="rent">Rent</option>
+            <option value="sale">Sale</option>
+            <option value="lease">Lease</option>
+          </select>
+        </div>
+
+        {/* Purpose */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Purpose</label>
+          <p className="text-sm text-gray-500">
+            Choose the property type category.
+          </p>
+          <select
+            name="purpose"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+            className="w-full border rounded-lg p-2"
+          >
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="land">Land</option>
+          </select>
+        </div>
+
+        {/* Category */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Category</label>
+          <p className="text-sm text-gray-500">
+            Pick the most accurate category for your listing.
+          </p>
+          <select
+            name="category"
+            required
+            className="w-full border rounded-lg p-2"
+          >
+            {categories[purpose].map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Price */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Price (KES)</label>
+          <p className="text-sm text-gray-500">
+            Enter the asking price or monthly rent in Kenyan Shillings.
+          </p>
+          <input
+            type="number"
+            name="price"
+            required
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Location */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700">City</label>
+            <p className="text-sm text-gray-500">
+              Main city or town (e.g. Nairobi).
+            </p>
+            <input name="city" className="w-full border rounded-lg p-2" />
+          </div>
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700">Estate</label>
+            <p className="text-sm text-gray-500">
+              Estate or neighborhood name.
+            </p>
+            <input name="estate" className="w-full border rounded-lg p-2" />
+          </div>
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700">Address</label>
+            <p className="text-sm text-gray-500">
+              Specific street or plot address.
+            </p>
+            <input name="address" className="w-full border rounded-lg p-2" />
+          </div>
+        </div>
+
+        {/* Bedrooms & Bathrooms (only for residential) */}
+        {purpose === "residential" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block font-medium text-gray-700">
+                Bedrooms
+              </label>
+              <p className="text-sm text-gray-500">Number of bedrooms.</p>
               <input
                 type="number"
                 name="bedrooms"
-                placeholder="Bedrooms"
-                value={form.bedrooms}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
+                className="w-full border rounded-lg p-2"
               />
+            </div>
+            <div className="space-y-1">
+              <label className="block font-medium text-gray-700">
+                Bathrooms
+              </label>
+              <p className="text-sm text-gray-500">Number of bathrooms.</p>
               <input
                 type="number"
                 name="bathrooms"
-                placeholder="Bathrooms"
-                value={form.bathrooms}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
+                className="w-full border rounded-lg p-2"
               />
-              <input
-                type="number"
-                name="size"
-                placeholder="Size (sqft)"
-                value={form.size}
-                onChange={handleChange}
-                className="p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-            <input
-              type="text"
-              name="amenities"
-              placeholder="Amenities (comma separated)"
-              value={form.amenities}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-            />
-            <textarea
-              name="description"
-              placeholder="Description"
-              value={form.description}
-              onChange={handleChange}
-              rows={4}
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500"
-            />
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition"
-              >
-                ← Back
-              </button>
-              <button
-                type="button"
-                onClick={nextStep}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
-              >
-                Next →
-              </button>
             </div>
           </div>
         )}
 
-        {/* Step 3 - Media & Submit */}
-        {step === 3 && (
-          <div className="space-y-6">
+        {/* Size */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Size</label>
+          <p className="text-sm text-gray-500">
+            Enter land or house size (e.g. 200 sqm, 1/8 acre).
+          </p>
+          <input
+            name="size"
+            placeholder="e.g. 200 sqm or 1/8 acre"
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Amenities */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Amenities</label>
+          <p className="text-sm text-gray-500">
+            Separate with commas (e.g. parking, wifi, pool).
+          </p>
+          <input
+            name="amenities"
+            placeholder="parking, wifi, pool"
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-1">
+          <label className="block font-medium text-gray-700">Description</label>
+          <p className="text-sm text-gray-500">
+            Provide more details about the property.
+          </p>
+          <textarea
+            name="description"
+            rows="4"
+            className="w-full border rounded-lg p-2"
+          />
+        </div>
+
+        {/* Image Upload */}
+        <div className="space-y-2">
+          <label className="block font-medium text-gray-700">Images</label>
+          <p className="text-sm text-gray-500">
+            Upload up to 10 images showcasing the property.
+          </p>
+          <div className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50">
             <input
               type="file"
               multiple
-              onChange={handleFileChange}
-              className="w-full p-3 border rounded-xl bg-gray-50"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+              id="images"
             />
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={prevStep}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition"
-              >
-                ← Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700 transition disabled:opacity-50"
-              >
-                {loading ? "Submitting..." : "Submit Property"}
-              </button>
-            </div>
+            <label
+              htmlFor="images"
+              className="cursor-pointer flex flex-col items-center"
+            >
+              <Upload className="w-6 h-6 mb-2 text-gray-500" />
+              <span className="text-gray-600">Click to upload (max 10)</span>
+            </label>
           </div>
-        )}
+
+          {/* Preview */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            {images.map((img, i) => (
+              <div key={i} className="relative group">
+                <img
+                  src={URL.createObjectURL(img)}
+                  alt="preview"
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute top-1 right-1 bg-white p-1 rounded-full shadow hover:bg-red-100"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div>
+          <button
+            type="submit"
+            className="w-full bg-gray-800 cursor-pointer text-white py-3 rounded-lg hover:bg-gray-900 transition"
+          >
+            Post Property
+          </button>
+        </div>
       </form>
     </div>
   );
-};
-
-export default Post;
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -26,20 +27,20 @@ const Hero = () => {
 
         {/* CTA buttons */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/search"
+          <Link
+            to="/listings"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-white/90 text-gray-900 px-6 py-3 font-medium shadow hover:bg-white transition"
           >
             <Search className="h-5 w-5" />
             Find Your Home
-          </a>
-          <a
-            href="/post"
+          </Link>
+          <Link
+            to="/dashboard/post"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 text-white px-6 py-3 font-medium shadow hover:bg-black transition"
           >
             <Plus className="h-5 w-5" />
             Post Property
-          </a>
+          </Link>
         </div>
       </div>
     </section>

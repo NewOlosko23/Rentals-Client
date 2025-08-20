@@ -13,12 +13,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-md">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Dashboard</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-4">
+          Dashboard
+        </h2>
         {user ? (
-          <div className="space-y-3">
+          <div className="space-y-3 text-sm tracking-tight">
             <p>
               <span className="font-medium text-gray-700">Name:</span>{" "}
-              {user.name}
+              {user.username}
             </p>
             <p>
               <span className="font-medium text-gray-700">Email:</span>{" "}

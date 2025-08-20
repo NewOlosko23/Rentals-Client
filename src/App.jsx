@@ -90,7 +90,7 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/post"
+          path="/dashboard/post-property"
           element={
             <PrivateRoute>
               <Post />
@@ -101,7 +101,7 @@ function App() {
         {/* Always accessible */}
         <Route path="/about" element={<About />} />
         <Route path="/listings" element={<Listings />} />
-        <Route path="/listing/:type/:id" element={<ListingPage />} />
+        <Route path="/listing/:transactionType/:id" element={<ListingPage />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogsPage />} />
         <Route path="*" element={<NotFound />} />

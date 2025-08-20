@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Button from "../../components/Button";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -64,15 +65,17 @@ const Newsletter = () => {
           </p>
         </div>
 
-        <button
+        <Button
           type="submit"
-          className={`w-full py-3 px-6 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition ${
+          variant="primary"
+          size="lg"
+          className={`w-full justify-center rounded-xl ${
             !agreed || !email ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={!agreed || !email}
         >
           Subscribe
-        </button>
+        </Button>
 
         {/* Animated confirmation message */}
         <p
