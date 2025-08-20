@@ -60,7 +60,7 @@ export default function PostProperty() {
         {/* Title */}
         <div className="space-y-1">
           <label className="block font-medium text-gray-700">Title</label>
-          <p className="text-sm text-gray-500 text-sm">
+          <p className="text-sm text-gray-500">
             Give your property a short, clear title (e.g. “Modern 2BR Apartment
             in Kilimani”).
           </p>
