@@ -70,9 +70,7 @@ export default function Header({ brand = "House Connect" }) {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all ${
-        scrolled
-          ? "bg-white/95 shadow-sm"
-          : "bg-white/70 backdrop-blur-md border-b border-transparent"
+        scrolled ? "bg-white/95 shadow-sm" : "bg-white/80"
       }`}
       role="banner"
     >
@@ -160,9 +158,9 @@ export default function Header({ brand = "House Connect" }) {
 
       {/* Mobile drawer */}
       {open && (
-        <div>
+        <div className="w-full">
           <div
-            className="fixed inset-0 z-40 bg-black/30"
+            className="fixed inset-0 z-40 bg-black/70 w-full"
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
@@ -171,9 +169,9 @@ export default function Header({ brand = "House Connect" }) {
             ref={panelRef}
             role="dialog"
             aria-label="Navigation"
-            className="fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm bg-white shadow-xl border-l border-gray-200"
+            className="fixed right-0 top-0 z-50 h-fit w-full max-w-2xl bg-white shadow-xl border-l border-gray-200"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b">
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-200">
               <Link to="/" className="text-lg font-semibold text-gray-900">
                 {brand}
               </Link>
@@ -186,7 +184,7 @@ export default function Header({ brand = "House Connect" }) {
               </button>
             </div>
 
-            <div className="px-4 py-4">
+            <div className="px-4 py-4 bg bg-gray-200">
               <nav className="mt-4 space-y-1" aria-label="Mobile Primary">
                 {nav.map((item) => {
                   const Icon = item.icon;

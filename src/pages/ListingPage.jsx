@@ -73,6 +73,9 @@ const ListingPage = () => {
         <div className="lg:col-span-2 space-y-10">
           {/* Header */}
           <div>
+            <p className="inline-flex items-center gap-2 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 border border-gray-300 bg-transparent hover:bg-gray-100  py-1 px-3 text-indigo-700 font-bold">
+              {listing.transactionType}
+            </p>
             <h1 className="text-xl font-bold text-gray-900">{listing.title}</h1>
             <p className="flex items-center gap-2 text-md text-gray-600 mt-2">
               <MapPin className="w-5 h-5 text-indigo-600" />
